@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FolderKanban, Settings, LogOut, Menu, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -11,15 +11,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
+  // প্রোটেকশন গার্ড: লগইন চেক করা
+  useEffect(() => {
+    // এখানে আমরা চেক করছি লোকাল স্টোরেজে বা কুকিতে টোকেন আছে কি না
+    // তুমি যদি কুকি ব্যবহার করো তবে কুকি চেক করো, টোকেন হলে localStorage.getItem('token')
+    const token = localStorage.getItem("token"); 
+    
+    if (!token) {
+      toast.error("Please login to access the dashboard!");
+      router.push("/login");
+    }
+  }, [router]);
+
   const handleLogout = () => {
+    // টোকেন রিমুভ করা
+    localStorage.removeItem("token");
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
     toast.success("Logged out successfully");
     router.push("/login");
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar Overlay (মোবাইলে বাইরে ক্লিক করলে বন্ধ হবে) */}
+      {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}

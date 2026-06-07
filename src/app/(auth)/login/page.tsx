@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast"; // Toast ইমপোর্ট করা হলো
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -16,9 +17,20 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", formData);
       localStorage.setItem("token", response.data.token);
+      
+      // সাকসেস টোস্ট
+      toast.success("Login Successful! Welcome back.", {
+        duration: 3000,
+        position: "top-right",
+      });
+      
       router.push("/dashboard/projects");
     } catch (error) {
-      alert("Login failed. Please check your credentials.");
+      // এরর টোস্ট
+      toast.error("Login failed. Please check your credentials.", {
+        duration: 3000,
+        position: "top-right",
+      });
     } finally {
       setLoading(false);
     }

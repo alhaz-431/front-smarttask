@@ -12,28 +12,22 @@ export default function SignupPage() {
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // ব্যাকএন্ডের রেজিস্টার এন্ডপয়েন্ট
-      await api.post("/auth/register", formData);
-      
-      toast.success("Account created successfully!", {
-        duration: 3000,
-        position: "top-right",
-      });
-      
-      router.push("/login");
-    } catch (error) {
-      toast.error("Registration failed. Please try again.", {
-        duration: 3000,
-        position: "top-right",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  e.preventDefault();
+  setLoading(true);
+  try {
+    // এখানে /auth/register এর পরিবর্তে /auth/signup ব্যবহার করো
+    await api.post("/auth/signup", formData); 
+    
+    toast.success("Account created successfully!");
+    router.push("/login");
+  } catch (error: any) {
+    // এরর মেসেজটি সার্ভার থেকে ডাইনামিক্যালি দেখাও
+    const message = error.response?.data?.message || "Registration failed. Please try again.";
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border border-gray-100">

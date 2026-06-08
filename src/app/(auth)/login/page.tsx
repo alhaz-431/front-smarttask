@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { setUser } = useAuth(); // AuthContext থেকে setUser
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,20 +21,29 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", formData);
       
-      // টোকেন ও ইউজার সেট করা
-      document.cookie = `token=${response.data.token}; path=/; max-age=86400; SameSite=Strict`;
+      // ১. টোকেন ও ইউজার ডাটা সেভ করা (Persistence)
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      
+      // ২. কন্টেক্সট আপডেট করা
       setUser(response.data.user);
+      
       toast.success("Welcome back!");
 
-      // রোল অনুযায়ী রিডাইরেকশন
-      const role = response.data.user?.role;
-      if (role === "admin") router.push("/dashboard/admin");
-      else if (role === "manager") router.push("/dashboard/manager");
-      else router.push("/dashboard/projects");
+      // ৩. রোল অনুযায়ী রিডাইরেকশন (নিরাপদ পদ্ধতি)
+      const role = response.data.user?.role?.toLowerCase(); 
+      
+      if (role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (role === "manager") {
+        router.push("/dashboard/manager");
+      } else {
+        router.push("/dashboard/projects");
+      }
       
       router.refresh();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Login failed.");
+      toast.error(error.response?.data?.error || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -50,14 +59,12 @@ export default function LoginPage() {
           <p className="text-gray-500 mb-8">Login to your account to continue.</p>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Field */}
             <div className="relative">
               <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
               <input type="email" placeholder="Email Address" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
                 value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
             </div>
 
-            {/* Password Field */}
             <div className="relative">
               <Lock className="absolute left-3 top-3.5 text-gray-400" size={18} />
               <input type="password" placeholder="Password" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
@@ -74,7 +81,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* ডান পাশ: ভিজ্যুয়াল স্লাইড */}
+        {/* ডান পাশ: ভিজ্যুয়াল */}
         <div className="hidden lg:flex w-1/2 bg-blue-600 p-10 items-center justify-center text-white text-center">
           <div>
             <LogIn size={100} className="mx-auto mb-4 opacity-80" />

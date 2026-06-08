@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthContext";
 
 interface Project {
   id: string;
@@ -11,11 +13,19 @@ interface Project {
   description: string;
 }
 
-export default function ProjectsContent() {
+export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ title: "", description: "" });
+  
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // অথেন্টিকেশন চেক
+  useEffect(() => {
+    if (!user) router.push("/login");
+  }, [user, router]);
 
   const fetchProjects = async () => {
     try {
@@ -46,30 +56,32 @@ export default function ProjectsContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("আপনি কি ডিলিট করতে নিশ্চিত?")) return;
+    if (!confirm("আপনি কি নিশ্চিত এটি ডিলিট করতে চান?")) return;
     try {
       await api.delete(`/projects/${id}`);
       setProjects(projects.filter((p) => p.id !== id));
       toast.success("প্রজেক্ট ডিলিট হয়েছে");
     } catch (error) {
-      toast.error("ডিলিট ব্যর্থ হয়েছে");
+      toast.error("ডিলিট করতে ব্যর্থ হয়েছে");
     }
   };
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">My Projects</h1>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
         >
           <Plus size={18} /> New Project
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-600" /></div>
+        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-600" size={32} /></div>
+      ) : projects.length === 0 ? (
+        <div className="text-center py-20 text-gray-500">কোনো প্রজেক্ট নেই। একটি নতুন প্রজেক্ট তৈরি করুন।</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((p) => (
@@ -87,6 +99,7 @@ export default function ProjectsContent() {
         </div>
       )}
 
+      {/* ক্রিয়েট মডাল */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <form onSubmit={handleCreate} className="bg-white p-8 rounded-2xl w-full max-w-sm space-y-4">

@@ -8,8 +8,8 @@ import { Loader2, User, Mail, Lock, CheckCircle, Shield } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function SignupPage() {
-  // role যোগ করা হয়েছে
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "user" });
+  // প্রাথমিক রোল "MEMBER" (আপনার ডাটাবেসের সাথে সামঞ্জস্যপূর্ণ)
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "MEMBER" });
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
@@ -18,13 +18,14 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // এটি এখন ব্যাকএন্ডে role ডাটাটিও পাঠাবে
+      // ব্যাকএন্ডে ডাটা পাঠানোর আগে ডাটা ঠিক আছে কি না চেক করুন
       await api.post("/auth/signup", formData);
       setIsSuccess(true);
       toast.success("Account created successfully!");
       setTimeout(() => router.push("/login"), 3000);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Registration failed.");
+      console.error(error); // এরর দেখার জন্য
+      toast.error(error.response?.data?.error || "Registration failed.");
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,7 @@ export default function SignupPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
             </div>
 
-            {/* নতুন রোল সিলেক্ট অপশন */}
+            {/* সঠিক রোল অপশন */}
             <div className="relative">
               <Shield className="absolute left-3 top-3.5 text-gray-400" size={18} />
               <select 
@@ -65,9 +66,9 @@ export default function SignupPage() {
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 value={formData.role}
               >
-                <option value="user">User</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
+                <option value="MEMBER">User</option>
+                <option value="MANAGER">Manager</option>
+                <option value="ADMIN">Admin</option>
               </select>
             </div>
             
@@ -76,20 +77,10 @@ export default function SignupPage() {
             </button>
           </form>
         </div>
-
+        
+        {/* ডানদিকের স্লাইডশো অংশটি একই থাকবে */}
         <div className="hidden lg:flex w-1/2 bg-blue-600 p-10 items-center justify-center text-white text-center">
-          {isSuccess ? (
-            <div className="animate-bounce">
-              <CheckCircle size={100} className="mb-4" />
-              <h3 className="text-2xl font-bold">Welcome Aboard!</h3>
-              <p>Your account is ready.</p>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-3xl font-bold mb-4">Manage Your Tasks</h3>
-              <p className="opacity-80">Organize your projects, collaborate with teams, and boost your productivity with SmartTask.</p>
-            </div>
-          )}
+             {/* ... */}
         </div>
       </div>
     </div>

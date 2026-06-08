@@ -8,12 +8,12 @@ import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, setUser } = useAuth(); // ইউজার ডাটা নিলাম
+  const { user, setUser } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"; // কুকি ডিলিট
-    setUser(null); // স্টেট খালি করা
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    setUser(null);
     router.push("/login");
   };
 

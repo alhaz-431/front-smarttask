@@ -1,20 +1,16 @@
 "use client";
-
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// ১. কনটেক্সট তৈরি করা
 const AuthContext = createContext<any>(null);
 
-// ২. প্রোভাইডার তৈরি করা
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState(null); // ইউজারের তথ্য রাখার স্টেট
-
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const [user, setUser] = useState(null);
+  return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
 };
 
-// ৩. কাস্টম হুক (ব্যবহারের সুবিধার্থে)
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  // সার্ভার সাইডে এরর এড়াতে নিরাপদ রিটার্ন
+  if (!context) return { user: null, setUser: () => {} };
+  return context;
+};

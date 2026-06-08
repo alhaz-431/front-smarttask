@@ -26,11 +26,11 @@ export default function LoginPage() {
       setUser(response.data.user);
       toast.success("Welcome back!");
 
-      // রোল অনুযায়ী রিডাইরেকশন লজিক
+      // রোল অনুযায়ী রিডাইরেকশন
       const role = response.data.user?.role;
       if (role === "admin") router.push("/dashboard/admin");
       else if (role === "manager") router.push("/dashboard/manager");
-      else router.push("/dashboard/projects"); // ডিফল্ট পাথ
+      else router.push("/dashboard/projects");
       
       router.refresh();
     } catch (error: any) {
@@ -42,35 +42,44 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="flex w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[500px]">
+      <div className="flex w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px]">
         
         {/* বাম পাশ: ফর্ম */}
-        <div className="w-full lg:w-1/2 p-8 flex flex-col justify-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Welcome Back</h2>
+        <div className="w-full lg:w-1/2 p-10 flex flex-col justify-center">
+          <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
+          <p className="text-gray-500 mb-8">Login to your account to continue.</p>
+          
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Field */}
             <div className="relative">
-              <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
-              <input type="email" placeholder="Email Address" className="w-full pl-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+              <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              <input type="email" placeholder="Email Address" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
+                value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
             </div>
+
+            {/* Password Field */}
             <div className="relative">
-              <Lock className="absolute left-3 top-3 text-gray-400" size={18} />
-              <input type="password" placeholder="Password" className="w-full pl-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+              <Lock className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              <input type="password" placeholder="Password" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
+                value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
             </div>
-            <button disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center">
+            
+            <button disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center justify-center">
               {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
             </button>
           </form>
-          <p className="text-center mt-4 text-sm text-gray-600">
+
+          <p className="mt-6 text-center text-gray-600">
             Don't have an account? <Link href="/signup" className="text-blue-600 font-bold hover:underline">Sign Up</Link>
           </p>
         </div>
 
         {/* ডান পাশ: ভিজ্যুয়াল স্লাইড */}
-        <div className="hidden lg:flex w-1/2 bg-blue-600 items-center justify-center text-white p-8 text-center">
+        <div className="hidden lg:flex w-1/2 bg-blue-600 p-10 items-center justify-center text-white text-center">
           <div>
-            <LogIn size={80} className="mx-auto mb-4 opacity-80" />
-            <h3 className="text-2xl font-bold">SmartTask Login</h3>
-            <p className="text-blue-100 mt-2">Access your dashboard and start managing your tasks efficiently.</p>
+            <LogIn size={100} className="mx-auto mb-4 opacity-80" />
+            <h3 className="text-3xl font-bold mb-4">SmartTask Login</h3>
+            <p className="opacity-80">Access your dashboard and start managing your tasks efficiently.</p>
           </div>
         </div>
       </div>

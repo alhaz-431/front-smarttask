@@ -13,8 +13,11 @@ export default function Navbar() {
 
   const handleLogout = () => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
-    router.push("/login");
+    setIsOpen(false);
+    router.push("/auth/login");
   };
 
   return (
@@ -26,30 +29,24 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6 items-center">
             <Link href="/" className="text-gray-600 hover:text-blue-600 transition">Home</Link>
-            
             {user ? (
               <>
                 <Link href="/dashboard/projects" className="flex items-center gap-2 text-gray-600 hover:text-blue-600">
                   <LayoutDashboard size={18} /> Dashboard
                 </Link>
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium"
-                >
+                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium">
                   <LogOut size={18} /> Logout
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="text-gray-600 hover:text-blue-600 transition">Login</Link>
-                <Link href="/signup" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
-                  Get Started
-                </Link>
+                <Link href="/auth/login" className="text-gray-600 hover:text-blue-600 transition">Login</Link>
+                <Link href="/auth/signup" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">Get Started</Link>
               </>
             )}
           </div>
 
-          {/* Mobile Button */}
+          {/* Mobile Toggle Button */}
           <div className="md:hidden">
             <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -61,13 +58,16 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white border-t p-4 space-y-4">
-          <Link href="/" className="block text-gray-600">Home</Link>
+          <Link href="/" onClick={() => setIsOpen(false)} className="block text-gray-600">Home</Link>
           {user ? (
-            <button onClick={handleLogout} className="block text-red-500">Logout</button>
+            <>
+              <Link href="/dashboard/projects" onClick={() => setIsOpen(false)} className="block text-gray-600">Dashboard</Link>
+              <button onClick={handleLogout} className="block text-red-500 w-full text-left">Logout</button>
+            </>
           ) : (
             <>
-              <Link href="/login" className="block text-gray-600">Login</Link>
-              <Link href="/signup" className="block bg-blue-600 text-white p-2 rounded text-center">Get Started</Link>
+              <Link href="/auth/login" onClick={() => setIsOpen(false)} className="block text-gray-600">Login</Link>
+              <Link href="/auth/signup" onClick={() => setIsOpen(false)} className="block bg-blue-600 text-white p-2 rounded text-center">Get Started</Link>
             </>
           )}
         </div>

@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth/AuthContext";
 import Link from "next/link";
-import { LayoutGrid, FolderKanban, Users, ClipboardList, LogOut } from "lucide-react";
+import { FolderKanban, Users, ClipboardList, Loader2 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -13,17 +13,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: "All Tasks", href: "/dashboard/tasks", icon: <ClipboardList size={20} />, roles: ["admin"] },
   ];
 
+  // যদি user লোড হতে দেরি হয়, তবে একটি লোডিং ইন্ডিকেটর দেখানো ভালো
+  // এটি বিল্ড টাইমেও লেআউটকে স্থিতিশীল রাখে
+  if (user === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="animate-spin text-blue-600" size={32} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md hidden md:block">
         <div className="p-6">
           <h2 className="text-xl font-bold text-blue-600">Dashboard</h2>
-          <p className="text-xs text-gray-400 capitalize">{user?.role} Mode</p>
+          <p className="text-xs text-gray-400 capitalize">{user?.role ?? "Guest"} Mode</p>
         </div>
         <nav className="mt-4 px-4 space-y-2">
           {menuItems.map((item) => (
-            item.roles.includes(user?.role) && (
+            // user?.role যদি null হয়, তবে সেটি মেনু আইটেমের সাথে মিলবে না (নিরাপদ)
+            item.roles.includes(user?.role ?? "") && (
               <Link
                 key={item.name}
                 href={item.href}

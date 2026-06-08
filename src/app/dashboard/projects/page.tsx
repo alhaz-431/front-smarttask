@@ -22,9 +22,8 @@ export default function ProjectsPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  // অথেন্টিকেশন চেক
   useEffect(() => {
-    if (!user) router.push("/login");
+    if (!user) router.push("/auth/login");
   }, [user, router]);
 
   const fetchProjects = async () => {
@@ -50,8 +49,8 @@ export default function ProjectsPage() {
       setIsModalOpen(false);
       setFormData({ title: "", description: "" });
       fetchProjects();
-    } catch (error) {
-      toast.error("তৈরি করতে ব্যর্থ হয়েছে");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "তৈরি করতে ব্যর্থ হয়েছে");
     }
   };
 
@@ -67,7 +66,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">My Projects</h1>
         <button 
@@ -104,11 +103,37 @@ export default function ProjectsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <form onSubmit={handleCreate} className="bg-white p-8 rounded-2xl w-full max-w-sm space-y-4">
             <h2 className="text-xl font-bold mb-4">Create Project</h2>
-            <input className="w-full p-2 border rounded-lg" placeholder="Title" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
-            <input className="w-full p-2 border rounded-lg" placeholder="Description" onChange={(e) => setFormData({...formData, description: e.target.value})} />
+            
+            <input 
+              className="w-full p-2 border rounded-lg" 
+              placeholder="Title" 
+              value={formData.title} 
+              onChange={(e) => setFormData({...formData, title: e.target.value})} 
+              required 
+            />
+            
+            <input 
+              className="w-full p-2 border rounded-lg" 
+              placeholder="Description" 
+              value={formData.description} 
+              onChange={(e) => setFormData({...formData, description: e.target.value})} 
+              required
+            />
+            
             <div className="flex gap-2">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 p-2 border rounded-lg">Cancel</button>
-              <button className="flex-1 p-2 bg-blue-600 text-white rounded-lg">Save</button>
+              <button 
+                type="button" 
+                onClick={() => setIsModalOpen(false)} 
+                className="flex-1 p-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="flex-1 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Save
+              </button>
             </div>
           </form>
         </div>

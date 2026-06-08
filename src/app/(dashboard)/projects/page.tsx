@@ -1,10 +1,10 @@
-"use client";
-import dynamic from "next/dynamic";
-
-const ProjectsContent = dynamic(() => import("@/components/auth/ProjectsContent"), {
-  ssr: false, 
-});
+import ProjectsContent from "@/components/auth/ProjectsContent";
 
 export default function Page() {
-  return <ProjectsContent />;
+  return (
+    <div>
+      <h1>Dashboard Test</h1>
+      <ProjectsContent />
+    </div>
+  );
 }

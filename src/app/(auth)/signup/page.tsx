@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 export default function SignupPage() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false); // সাকসেস স্টেট
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -18,9 +18,9 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await api.post("/auth/signup", formData);
-      setIsSuccess(true); // স্লাইডশো ট্রিগার হবে
+      setIsSuccess(true);
       toast.success("Account created successfully!");
-      setTimeout(() => router.push("/login"), 3000); // ৩ সেকেন্ড পর রিডাইরেক্ট
+      setTimeout(() => router.push("/login"), 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Registration failed.");
     } finally {
@@ -29,7 +29,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="flex w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px]">
         
         {/* বাম পাশ: ফর্ম */}
@@ -38,12 +38,41 @@ export default function SignupPage() {
           <p className="text-gray-500 mb-8">Join SmartTask to manage projects efficiently.</p>
           
           <form onSubmit={handleSignup} className="space-y-4">
+            {/* Name Input */}
             <div className="relative">
               <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
-              <input type="text" placeholder="Full Name" className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+              <input 
+                type="text" 
+                placeholder="Full Name" 
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                required 
+              />
             </div>
-            {/* বাকি ইনপুটগুলো এখানে একইভাবে থাকবে */}
+
+            {/* Email Input */}
+            <div className="relative">
+              <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                required 
+              />
+            </div>
+
+            {/* Password Input */}
+            <div className="relative">
+              <Lock className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              <input 
+                type="password" 
+                placeholder="Password" 
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" 
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+                required 
+              />
+            </div>
             
             <button disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
               {loading ? <Loader2 className="animate-spin mx-auto" /> : "Sign Up"}

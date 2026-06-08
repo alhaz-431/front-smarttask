@@ -1,8 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
 
-// ইমপোর্ট পাথটি আপেক্ষিক (Relative) করে দেখুন
-const ProjectsContent = dynamic(() => import("../../../components/auth/ProjectsContent"), {
+// পাথটি নিশ্চিত করুন: components/auth/ProjectsContent
+const ProjectsContent = dynamic(() => import("@/components/auth/ProjectsContent"), {
   ssr: false, 
 });
 

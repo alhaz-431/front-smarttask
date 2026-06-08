@@ -12,4 +12,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+
+console.log("Axios Base URL:", process.env.NEXT_PUBLIC_API_URL);
 export default api;

@@ -28,16 +28,15 @@ export default function LoginPage() {
       setUser(response.data.user);
       toast.success("Welcome back!");
 
-      // রোল অনুযায়ী রিডাইরেকশন
-      const role = response.data.user?.role?.toLowerCase();
-      if (role === "admin") {
-        router.push("/dashboard/admin");
-      } else if (role === "manager") {
-        router.push("/dashboard/manager");
-      } else {
-        router.push("/dashboard/projects");
-      }
-      
+  const role = response.data.user?.role?.toLowerCase();
+
+if (role === "admin") {
+  router.push("/admindashboard/admin");
+} else if (role === "manager") {
+  router.push("/managerdashboard/manager"); // এখানে পাথটি পরিবর্তন করা হয়েছে
+} else {
+  router.push("/dashboard/projects"); // মেম্বারদের জন্য
+}
       router.refresh();
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Login failed.");

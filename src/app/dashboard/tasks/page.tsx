@@ -1,45 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import api from "@/lib/axios";
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
-  completed: boolean;
+  status: "TODO" | "COMPLETED";
 }
 
-export default function TasksPage() {
+export default function TasksPage({ projectId }: { projectId: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
 
-  const handleAddTask = () => {
-    if (!newTask.trim()) return;
-    const task: Task = {
-      id: Date.now(),
-      title: newTask,
-      completed: false,
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await api.get(`/tasks/project/${projectId}`);
+        setTasks(res.data);
+      } catch (error) {
+        toast.error("টাস্ক লোড করতে সমস্যা হয়েছে");
+      }
     };
-    setTasks([...tasks, task]);
-    setNewTask("");
-    toast.success("টাস্ক যোগ করা হয়েছে!");
+    fetchTasks();
+  }, [projectId]);
+
+  const handleAddTask = async () => {
+    if (!newTask.trim()) return;
+    try {
+      const res = await api.post("/tasks", { title: newTask, projectId });
+      setTasks([...tasks, res.data]);
+      setNewTask("");
+      toast.success("টাস্ক যোগ করা হয়েছে!");
+    } catch (error) {
+      toast.error("টাস্ক তৈরি করতে সমস্যা হয়েছে");
+    }
   };
 
-  const toggleTask = (id: number) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  const deleteTask = async (id: string) => {
+    try {
+      await api.delete(`/tasks/${id}`);
+      setTasks(tasks.filter((t) => t.id !== id));
+      toast.success("টাস্ক ডিলিট করা হয়েছে");
+    } catch (error) {
+      toast.error("ডিলিট করতে সমস্যা হয়েছে");
+    }
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(t => t.id !== id));
-    toast.success("টাস্ক ডিলিট করা হয়েছে");
+  const toggleTask = async (task: Task) => {
+    const newStatus = task.status === "COMPLETED" ? "TODO" : "COMPLETED";
+    try {
+      await api.patch(`/tasks/${task.id}/status`, { status: newStatus });
+      setTasks(tasks.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
+    } catch (error) {
+      toast.error("স্ট্যাটাস আপডেট করতে সমস্যা হয়েছে");
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-6">My Tasks</h1>
       
-      {/* টাস্ক ইনপুট */}
       <div className="flex gap-2 mb-8">
         <input
           value={newTask}
@@ -55,7 +78,6 @@ export default function TasksPage() {
         </button>
       </div>
 
-      {/* টাস্ক লিস্ট */}
       <div className="space-y-3">
         {tasks.length === 0 ? (
           <p className="text-gray-400 text-center py-10">কোনো টাস্ক নেই!</p>
@@ -63,13 +85,13 @@ export default function TasksPage() {
           tasks.map((task) => (
             <div 
               key={task.id} 
-              className={`flex items-center justify-between p-4 bg-white rounded-xl border ${task.completed ? 'opacity-60' : ''}`}
+              className={`flex items-center justify-between p-4 bg-white rounded-xl border ${task.status === "COMPLETED" ? 'opacity-60' : ''}`}
             >
               <div className="flex items-center gap-3">
-                <button onClick={() => toggleTask(task.id)} className={task.completed ? "text-green-500" : "text-gray-300"}>
+                <button onClick={() => toggleTask(task)} className={task.status === "COMPLETED" ? "text-green-500" : "text-gray-300"}>
                   <CheckCircle2 size={24} />
                 </button>
-                <span className={task.completed ? "line-through text-gray-500" : "text-gray-800"}>
+                <span className={task.status === "COMPLETED" ? "line-through text-gray-500" : "text-gray-800"}>
                   {task.title}
                 </span>
               </div>

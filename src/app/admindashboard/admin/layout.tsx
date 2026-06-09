@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutGrid, Users, Briefcase, CheckSquare, Activity, Settings, LogOut, Home } from 'lucide-react';
+import { LayoutGrid, Users, Briefcase, CheckSquare, Activity, Settings, LogOut, Home, UserCog, BriefcaseBusiness } from 'lucide-react';
 
 // সাইডবার লিংক কম্পোনেন্ট
 const SidebarLink = ({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) => (
@@ -24,12 +24,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex-1 p-4 space-y-2">
           <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider p-3">Admin Menu</div>
           
-          <SidebarLink href="/dashboard/admin" icon={<Home size={20} />} label="Dashboard" />
-          <SidebarLink href="/dashboard/admin/users" icon={<Users size={20} />} label="Team Members" />
-          <SidebarLink href="/dashboard/admin/projects" icon={<Briefcase size={20} />} label="All Projects" />
-          <SidebarLink href="/dashboard/admin/tasks" icon={<CheckSquare size={20} />} label="All Tasks" />
-          <SidebarLink href="/dashboard/admin/logs" icon={<Activity size={20} />} label="Activity Logs" />
-          <SidebarLink href="/dashboard/admin/settings" icon={<Settings size={20} />} label="System Settings" />
+          <SidebarLink href="/admindashboard/admin" icon={<Home size={20} />} label="Dashboard" />
+          <SidebarLink href="/admindashboard/admin/users" icon={<Users size={20} />} label="Team Members" />
+          <SidebarLink href="/admindashboard/admin/projects" icon={<Briefcase size={20} />} label="All Projects" />
+          <SidebarLink href="/admindashboard/admin/tasks" icon={<CheckSquare size={20} />} label="All Tasks" />
+          <SidebarLink href="/admindashboard/admin/logs" icon={<Activity size={20} />} label="Activity Logs" />
+          <SidebarLink href="/admindashboard/admin/settings" icon={<Settings size={20} />} label="System Settings" />
         </nav>
 
         {/* বটম সেকশন - লগআউট */}
@@ -42,9 +42,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto">
-        {/* টপ বার (ঐচ্ছিক) */}
-        <header className="bg-white shadow-sm p-4 border-b">
+        {/* টপ বার */}
+        <header className="bg-white shadow-sm p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold text-gray-800">Admin Control Panel</h2>
+          
+          {/* দ্রুত ড্যাশবোর্ড সুইচার বাটনসমূহ */}
+          <div className="flex gap-2">
+            <Link href="/admindashboard/admin" className="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition">
+              <Home size={14} /> Admin
+            </Link>
+            <Link href="/managerdashboard/manager" className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full hover:bg-green-200 transition">
+              <UserCog size={14} /> Manager
+            </Link>
+            <Link href="/dashboard/projects" className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full hover:bg-orange-200 transition">
+              <BriefcaseBusiness size={14} /> Member
+            </Link>
+          </div>
         </header>
 
         {/* ডাইনামিক পেজ কন্টেন্ট */}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, ShieldCheck, UserCog } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +20,15 @@ export default function Navbar() {
     router.push("/auth/login");
   };
 
+  // রোল অনুযায়ী পাথ নির্ধারণ
+  const getDashboardPath = () => {
+    if (!user) return "/auth/login";
+    const role = user.role?.toLowerCase();
+    if (role === 'admin') return "/admindashboard/admin";
+    if (role === 'manager') return "/managerdashboard/manager";
+    return "/dashboard/projects";
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,11 +38,22 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6 items-center">
             <Link href="/" className="text-gray-600 hover:text-blue-600 transition">Home</Link>
+            
             {user ? (
               <>
-                <Link href="/dashboard/projects" className="flex items-center gap-2 text-gray-600 hover:text-blue-600">
+                {/* রোল অনুযায়ী ড্যাশবোর্ড লিঙ্ক */}
+                <Link href={getDashboardPath()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
                   <LayoutDashboard size={18} /> Dashboard
                 </Link>
+
+                {/* যদি অ্যাডমিন হয়, তবে সে যেন অন্য ড্যাশবোর্ডগুলোও দেখতে পায় */}
+                {user.role?.toLowerCase() === 'admin' && (
+                  <div className="flex gap-3 border-l pl-6">
+                    <Link href="/managerdashboard/manager" className="text-xs text-green-600 hover:underline">Manager</Link>
+                    <Link href="/dashboard/projects" className="text-xs text-orange-600 hover:underline">Member</Link>
+                  </div>
+                )}
+
                 <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium">
                   <LogOut size={18} /> Logout
                 </button>
@@ -61,14 +81,11 @@ export default function Navbar() {
           <Link href="/" onClick={() => setIsOpen(false)} className="block text-gray-600">Home</Link>
           {user ? (
             <>
-              <Link href="/dashboard/projects" onClick={() => setIsOpen(false)} className="block text-gray-600">Dashboard</Link>
+              <Link href={getDashboardPath()} onClick={() => setIsOpen(false)} className="block text-blue-600 font-bold">My Dashboard</Link>
               <button onClick={handleLogout} className="block text-red-500 w-full text-left">Logout</button>
             </>
           ) : (
-            <>
-              <Link href="/auth/login" onClick={() => setIsOpen(false)} className="block text-gray-600">Login</Link>
-              <Link href="/auth/signup" onClick={() => setIsOpen(false)} className="block bg-blue-600 text-white p-2 rounded text-center">Get Started</Link>
-            </>
+            <Link href="/auth/login" onClick={() => setIsOpen(false)} className="block text-gray-600">Login</Link>
           )}
         </div>
       )}

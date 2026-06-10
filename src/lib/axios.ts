@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://smart-task-tpmn.onrender.com/api",
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
-        window.location.href = '/auth/login'; // ✅ /login থেকে fix করা হয়েছে
+        window.location.href = '/auth/login'; 
       }
     }
     return Promise.reject(error);

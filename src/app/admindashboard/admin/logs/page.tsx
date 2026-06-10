@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,16 +9,14 @@ export default function AdminLogsPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
+  useEffect(() => { fetchLogs(); }, []);
 
   const fetchLogs = async () => {
     try {
-      const res = await api.get("/activity-logs"); // নিশ্চিত করুন আপনার ব্যাকএন্ডে এই রুটটি আছে
+      const res = await api.get("/activity-logs");
       setLogs(res.data);
     } catch (err: any) {
-      toast.error("লগ ডাটা লোড করা যায়নি!");
+      toast.error("লগ ডাটা লোড করা যায়নি!");
     } finally {
       setLoading(false);
     }
@@ -50,9 +47,11 @@ export default function AdminLogsPage() {
               {logs.length > 0 ? (
                 logs.map((log: any) => (
                   <tr key={log.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
-                    <td className="p-4 flex items-center gap-3">
-                      <Terminal size={16} className="text-blue-500" />
-                      <span className="text-gray-700 font-medium">{log.action}</span>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Terminal size={16} className="text-blue-500" />
+                        <span className="text-gray-700 font-medium">{log.action}</span>
+                      </div>
                     </td>
                     <td className="p-4 text-gray-600">
                       <div className="flex items-center gap-2">
@@ -61,7 +60,8 @@ export default function AdminLogsPage() {
                     </td>
                     <td className="p-4 text-gray-500 text-sm">
                       <div className="flex items-center gap-2">
-                        <Clock size={16} /> {new Date(log.createdAt).toLocaleString()}
+                        <Clock size={16} />
+                        {new Date(log.timestamp).toLocaleString()} {/* ✅ fix */}
                       </div>
                     </td>
                   </tr>
@@ -69,8 +69,10 @@ export default function AdminLogsPage() {
               ) : (
                 <tr>
                   <td colSpan={3} className="p-10 text-center text-gray-500">
-                    <AlertCircle className="mx-auto mb-2 text-gray-400" />
-                    কোনো লগ ডাটা পাওয়া যায়নি।
+                    <div className="flex flex-col items-center gap-2">
+                      <AlertCircle className="text-gray-400" />
+                      কোনো লগ ডাটা পাওয়া যায়নি।
+                    </div>
                   </td>
                 </tr>
               )}

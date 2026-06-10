@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   // নিশ্চিত করুন আপনার .env ফাইলে এটি সঠিক এবং শেষে কোনো বাড়তি স্পেস নেই
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
-  withCredentials: true, // এটি কুকি বা সেশন হ্যান্ডেল করার জন্য খুব জরুরি
+  withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
   },

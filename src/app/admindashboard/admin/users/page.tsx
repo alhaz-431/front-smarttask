@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
-import { Trash2, Edit2, UserPlus, Loader2, X } from "lucide-react";
+import { Trash2, Edit2, UserPlus } from "lucide-react";
 
 export default function TeamMembersPage() {
   const [members, setMembers] = useState([]);
@@ -32,26 +32,26 @@ export default function TeamMembersPage() {
     e.preventDefault();
     try {
       if (editingMember) {
-        // এডিট করার জন্য PATCH রিকোয়েস্ট
+        // এডিট করার জন্য PATCH রিকোয়েস্ট
         await api.patch(`/users/${editingMember.id}`, formData);
-        toast.success("মেম্বার সফলভাবে আপডেট হয়েছে");
+        toast.success("মেম্বার সফলভাবে আপডেট হয়েছে");
       } else {
-        // নতুন যোগ করার জন্য POST রিকোয়েস্ট
+        // নতুন যোগ করার জন্য POST রিকোয়েস্ট
         await api.post("/users", formData);
-        toast.success("নতুন মেম্বার যুক্ত হয়েছে");
+        toast.success("নতুন মেম্বার যুক্ত হয়েছে");
       }
       setIsModalOpen(false);
       setEditingMember(null);
       setFormData({ name: "", email: "", role: "member" });
       fetchMembers();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "অপারেশন সফল হয়নি");
+      toast.error(err.response?.data?.error || "অপারেশন সফল হয়নি");
     }
   };
 
   const openEditModal = (member: any) => {
     setEditingMember(member);
-    setFormData({ name: member.name, email: member.email, role: member.role });
+    setFormData({ name: member.name, email: member.email, role: member.role.toLowerCase() });
     setIsModalOpen(true);
   };
 
@@ -67,19 +67,42 @@ export default function TeamMembersPage() {
         </button>
       </div>
 
-      {/* টেবিল লজিক */}
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <table className="w-full text-left">
-          {/* টেবিল হেডার ও বডি এখানে থাকবে */}
+          <thead className="bg-gray-50 border-b">
+            <tr>
+              <th className="p-4">Name</th>
+              <th className="p-4">Email</th>
+              <th className="p-4">Role</th>
+              <th className="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
           <tbody>
             {members.map((member: any) => (
               <tr key={member.id} className="border-b hover:bg-gray-50">
                 <td className="p-4">{member.name}</td>
                 <td className="p-4">{member.email}</td>
-                <td className="p-4">{member.role}</td>
+                <td className="p-4 uppercase">{member.role}</td>
                 <td className="p-4 text-right">
-                  <button onClick={() => openEditModal(member)} className="text-blue-600 mr-3"><Edit2 size={16} /></button>
-                  <button onClick={() => {/* delete logic */}} className="text-red-600"><Trash2 size={16} /></button>
+                  <button onClick={() => openEditModal(member)} className="text-blue-600 mr-3">
+                    <Edit2 size={16} />
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      if (confirm("আপনি কি নিশ্চিত এটি ডিলিট করতে চান?")) {
+                        try {
+                          await api.delete(`/users/${member.id}`);
+                          toast.success("মেম্বার ডিলিট হয়েছে");
+                          fetchMembers();
+                        } catch (err: any) {
+                          toast.error("ডিলিট করা যায়নি!");
+                        }
+                      }
+                    }} 
+                    className="text-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -87,7 +110,6 @@ export default function TeamMembersPage() {
         </table>
       </div>
 
-      {/* মোডাল */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg w-96 space-y-4">

@@ -107,7 +107,6 @@ export default function MemberTasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        // পাথ মিসম্যাচ এড়াতে সঠিক API Endpoint নিশ্চিত করুন
         const res = await api.get("/tasks/my-tasks"); 
         setTasks(res.data);
       } catch { toast.error("Tasks load করতে সমস্যা হয়েছে"); } finally { setLoading(false); }
@@ -117,8 +116,16 @@ export default function MemberTasksPage() {
 
   const handleStatusUpdate = async (id: string, next: Task["status"]) => {
     setUpdatingId(id);
+    
+    // স্ট্যাটাস ম্যাপিং (ব্যাকএন্ড Enum এর সাথে সামঞ্জস্যতা নিশ্চিত করতে)
+    const statusMap: Record<string, string> = {
+      "Todo": "TODO",
+      "In Progress": "IN_PROGRESS",
+      "Completed": "COMPLETED"
+    };
+
     try {
-      await api.patch(`/tasks/${id}/status`, { status: next });
+      await api.patch(`/tasks/${id}/status`, { status: statusMap[next] || next });
       setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status: next } : t)));
       toast.success(`Marked as ${next}`);
     } catch { toast.error("Status update ব্যর্থ হয়েছে"); } finally { setUpdatingId(null); }
@@ -148,7 +155,7 @@ export default function MemberTasksPage() {
                 onClick={() => setStatusFilter(s)} 
                 className={`text-xs px-3 py-1 rounded-lg transition ${statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
              >
-                {s}
+               {s}
              </button>
           ))}
         </div>

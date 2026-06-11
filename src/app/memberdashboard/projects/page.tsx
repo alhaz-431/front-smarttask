@@ -150,9 +150,15 @@ export default function MemberProjectsPage() {
         <div className="flex justify-center p-20"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((p) => (
-            <ProjectCard key={p.id} project={p} onView={() => router.push(`/memberdashboard/projects/${p.id}`)} />
-          ))}
+          {filtered.length === 0 ? (
+            <div className="col-span-full text-center py-20 text-gray-500">
+              <p>No projects found matching your criteria.</p>
+            </div>
+          ) : (
+            filtered.map((p) => (
+              <ProjectCard key={p.id} project={p} onView={() => router.push(`/memberdashboard/projects/${p.id}`)} />
+            ))
+          )}
         </div>
       )}
     </div>

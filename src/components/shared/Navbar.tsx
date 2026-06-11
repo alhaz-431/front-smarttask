@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, LogOut, LayoutDashboard, ShieldCheck, UserCog } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -20,13 +20,13 @@ export default function Navbar() {
     router.push("/auth/login");
   };
 
-  // রোল অনুযায়ী পাথ নির্ধারণ
+  // রোল অনুযায়ী সঠিক পাথ নির্ধারণ
   const getDashboardPath = () => {
     if (!user) return "/auth/login";
     const role = user.role?.toLowerCase();
     if (role === 'admin') return "/admindashboard/admin";
     if (role === 'manager') return "/managerdashboard/manager";
-    return "/dashboard/projects";
+    return "/memberdashboard/projects"; // আপনার নতুন সঠিক পাথ
   };
 
   return (
@@ -41,16 +41,15 @@ export default function Navbar() {
             
             {user ? (
               <>
-                {/* রোল অনুযায়ী ড্যাশবোর্ড লিঙ্ক */}
                 <Link href={getDashboardPath()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
                   <LayoutDashboard size={18} /> Dashboard
                 </Link>
 
-                {/* যদি অ্যাডমিন হয়, তবে সে যেন অন্য ড্যাশবোর্ডগুলোও দেখতে পায় */}
+                {/* Admin-এর জন্য অতিরিক্ত লিঙ্ক */}
                 {user.role?.toLowerCase() === 'admin' && (
-                  <div className="flex gap-3 border-l pl-6">
+                  <div className="flex gap-3 border-l pl-4">
                     <Link href="/managerdashboard/manager" className="text-xs text-green-600 hover:underline">Manager</Link>
-                    <Link href="/dashboard/projects" className="text-xs text-orange-600 hover:underline">Member</Link>
+                    <Link href="/memberdashboard/projects" className="text-xs text-orange-600 hover:underline">Member</Link>
                   </div>
                 )}
 
@@ -68,7 +67,7 @@ export default function Navbar() {
 
           {/* Mobile Toggle Button */}
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 p-2">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -77,11 +76,18 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t p-4 space-y-4">
+        <div className="md:hidden bg-white border-t p-4 space-y-4 shadow-lg">
           <Link href="/" onClick={() => setIsOpen(false)} className="block text-gray-600">Home</Link>
           {user ? (
             <>
               <Link href={getDashboardPath()} onClick={() => setIsOpen(false)} className="block text-blue-600 font-bold">My Dashboard</Link>
+              {/* মোবাইল মেনুতেও অ্যাডমিন অপশন */}
+              {user.role?.toLowerCase() === 'admin' && (
+                <>
+                  <Link href="/managerdashboard/manager" onClick={() => setIsOpen(false)} className="block text-green-600">Manager Dashboard</Link>
+                  <Link href="/memberdashboard/projects" onClick={() => setIsOpen(false)} className="block text-orange-600">Member Dashboard</Link>
+                </>
+              )}
               <button onClick={handleLogout} className="block text-red-500 w-full text-left">Logout</button>
             </>
           ) : (

@@ -7,18 +7,16 @@ import {
   CheckCircle2,
   Circle,
   Clock,
-  Search,
-  Filter,
-  Calendar,
-  AlertCircle,
   ChevronDown,
   FolderKanban,
   Tag,
+  AlertCircle,
+  Calendar,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import api from "@/lib/axios";
 
-// ── 1. Types ──────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────
 interface Task {
   id: string;
   title: string;
@@ -29,7 +27,7 @@ interface Task {
   projectName: string;
 }
 
-// ── 2. Config ─────────────────────────────────────────────────────────────
+// ── Config ─────────────────────────────────────────────────────────────
 const STATUS_FLOW: Record<Task["status"], Task["status"]> = {
   Todo: "In Progress",
   "In Progress": "Completed",
@@ -48,7 +46,7 @@ const PRIORITY_CONFIG: Record<Task["priority"], { class: string; dot: string }> 
   Low: { class: "bg-green-50 text-green-600 border border-green-100", dot: "bg-green-500" },
 };
 
-// ── 3. Helper Functions ──────────────────────────────────────────────────
+// ── Helper Functions ──────────────────────────────────────────────────
 function isOverdue(dateStr: string, status: Task["status"]) {
   return status !== "Completed" && new Date(dateStr) < new Date();
 }
@@ -57,7 +55,7 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// ── 4. Sub-Components ────────────────────────────────────────────────────
+// ── Sub-Components ────────────────────────────────────────────────────
 function StatusButton({ task, onUpdate, loading }: { task: Task; onUpdate: (id: string, next: Task["status"]) => void; loading: boolean }) {
   const config = STATUS_CONFIG[task.status];
   const Icon = config.icon;
@@ -98,7 +96,7 @@ function TaskCard({ task, onStatusUpdate, updatingId }: { task: Task; onStatusUp
   );
 }
 
-// ── 5. Main Page Component ───────────────────────────────────────────────
+// ── Main Page Component ───────────────────────────────────────────────
 export default function MemberTasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +107,8 @@ export default function MemberTasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await api.get("/tasks/my-tasks");
+        // পাথ মিসম্যাচ এড়াতে সঠিক API Endpoint নিশ্চিত করুন
+        const res = await api.get("/tasks/my-tasks"); 
         setTasks(res.data);
       } catch { toast.error("Tasks load করতে সমস্যা হয়েছে"); } finally { setLoading(false); }
     };
@@ -122,7 +121,7 @@ export default function MemberTasksPage() {
       await api.patch(`/tasks/${id}/status`, { status: next });
       setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status: next } : t)));
       toast.success(`Marked as ${next}`);
-    } catch { toast.error("Status update ব্যর্থ হয়েছে"); } finally { setUpdatingId(null); }
+    } catch { toast.error("Status update ব্যর্থ হয়েছে"); } finally { setUpdatingId(null); }
   };
 
   const filtered = tasks.filter((t) => 
@@ -135,20 +134,35 @@ export default function MemberTasksPage() {
       <div><h1 className="text-2xl font-bold">My Tasks</h1></div>
       
       {/* Search & Filter */}
-      <div className="bg-white rounded-2xl border p-4">
-        <input placeholder="Search tasks..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-4 py-2 border rounded-xl" />
+      <div className="bg-white rounded-2xl border p-4 shadow-sm">
+        <input 
+            placeholder="Search tasks..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="w-full pl-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" 
+        />
         <div className="flex gap-2 mt-3">
           {(["All", "Todo", "In Progress", "Completed"] as const).map((s) => (
-             <button key={s} onClick={() => setStatusFilter(s)} className={`text-xs px-3 py-1 rounded-lg ${statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100"}`}>{s}</button>
+             <button 
+                key={s} 
+                onClick={() => setStatusFilter(s)} 
+                className={`text-xs px-3 py-1 rounded-lg transition ${statusFilter === s ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+             >
+                {s}
+             </button>
           ))}
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500" /></div>
+        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((task) => <TaskCard key={task.id} task={task} onStatusUpdate={handleStatusUpdate} updatingId={updatingId} />)}
+          {filtered.length > 0 ? (
+            filtered.map((task) => <TaskCard key={task.id} task={task} onStatusUpdate={handleStatusUpdate} updatingId={updatingId} />)
+          ) : (
+            <p className="col-span-full text-center text-gray-400 py-10">No tasks found.</p>
+          )}
         </div>
       )}
     </div>
